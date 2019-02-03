@@ -1,0 +1,35 @@
+{
+  "name": "crypto-star-dapp",
+  "version": "1.0.0",
+  "description": "Udacity Blockchain Developer project to develop a digital app and deploy to Ethereum network",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stevenhankin/Crypto-Star-Dapp.git"
+  },
+  "keywords": [
+    "Ethereum",
+    "ERC20",
+    "ERC721"
+  ],
+  "author": "Steve Hankin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/stevenhankin/Crypto-Star-Dapp/issues"
+  },
+  "homepage": "https://github.com/stevenhankin/Crypto-Star-Dapp#readme",
+  "dependencies": {
+    "any-promise": "^1.3.0",
+    "bindings": "^1.4.0",
+    "file-uri-to-path": "^1.0.0",
+    "openzeppelin-solidity": "^2.1.2",
+    "truffle-hdwallet-provider": "^1.0.3",
+    "websocket": "^1.0.28"
+  }
+}
