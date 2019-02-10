@@ -25,7 +25,7 @@ class ClaimStar extends Component {
         try {
             console.log({from: account})
             this.setState({requestStatus: "Submitted..."});
-            await createStar(starName, starNameHash).send({from: account});
+            await createStar(starName, starNameHash).call({from: account});
             this.setState({requestStatus: "Confirmed ✅"})
         } catch (err) {
             console.error("FAILURE!",err)
