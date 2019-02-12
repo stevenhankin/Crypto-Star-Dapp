@@ -16,7 +16,7 @@ class App extends Component {
             console.log('**** COMPONENT MOUNTED!')
 
             // window.ethereum will be the MetaMask injected object (if metamask is installed)
-            const metaMaskEthProvider = window.ethereum;
+            const metaMaskEthProvider = window.ethereumXXX;
             console.log('@1')
 
             let web3 = {};
