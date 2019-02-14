@@ -1,6 +1,12 @@
 import React, {Component} from "react";
 import ClaimStar from "./ClaimStar";
+import LookupStar from "./LookupStar";
+import SellStar from "./SellStar";
+import BuyStar from "./BuyStar";
 // import getWeb3 from "./utils/getWeb3";
+import Tabs from "react-bootstrap/Tabs";
+import Tab from "react-bootstrap/Tab";
+
 import Web3 from "web3";
 
 import "./App.css";
@@ -125,8 +131,20 @@ class App extends Component {
                 </p>
                 <div>The stored value is: {this.state.storageValue}</div>
                 <hr/>
-                <ClaimStar instance={this.state.instance} account={this.state.account}/>
-                <hr/>
+                <Tabs defaultActiveKey="claim">
+                    <Tab eventKey="claim" title="Claim">
+                        <ClaimStar instance={this.state.instance} account={this.state.account}/>
+                    </Tab>
+                    <Tab eventKey="lookup" title="Lookup">
+                        <LookupStar instance={this.state.instance} account={this.state.account}/>
+                    </Tab>
+                    <Tab eventKey="sell" title="Sell">
+                        <SellStar instance={this.state.instance} account={this.state.account}/>
+                    </Tab>
+                    <Tab eventKey="buy" title="Buy">
+                        <BuyStar instance={this.state.instance} account={this.state.account}/>
+                    </Tab>
+                </Tabs>
             </div>
         );
     }

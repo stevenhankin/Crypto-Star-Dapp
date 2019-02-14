@@ -7,7 +7,7 @@ import Container from "react-bootstrap/Container";
 
 const createKeccakHash = require('keccak')
 
-class ClaimStar extends Component {
+class LookupStar extends Component {
 
     constructor(props) {
         super(props);
@@ -52,7 +52,7 @@ class ClaimStar extends Component {
             <div>
                 {/*<Container>*/}
                 {/*<h2>Claim a star</h2>*/}
-                <h2>Claim</h2>
+                <h2>Lookup Star</h2>
                 <Form onSubmit={this.handleSubmit}>
 
                     <Form.Group as={Row}>
@@ -79,4 +79,4 @@ class ClaimStar extends Component {
     }
 }
 
-export default ClaimStar;
+export default LookupStar;
