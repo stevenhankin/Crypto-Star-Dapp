@@ -31,7 +31,8 @@ class ClaimStar extends Component {
             console.log({from: account})
             this.setState({requestStatus: "Submitted..."});
             await createStar(starName, starNameHash).call({from: account});
-            this.setState({requestStatus: "Confirmed ✅"})
+            console.log(JSON.stringify(starNameHash))
+            this.setState({requestStatus: `Confirmed ✅  (${starName} has ID ${starNameHash.toString('hex')})`})
         } catch (err) {
             console.error("FAILURE!", err)
             this.setState({requestStatus: "Failed"})
@@ -65,6 +66,11 @@ class ClaimStar extends Component {
                             <input type="submit" value="Claim now!" disabled={!this.state.starName}/>
                         </Col>
                     </Form.Group>
+
+                    {/*TODO add Story*/}
+                    {/*TODO add Declination*/}
+                    {/*TODO add Magnitude*/}
+                    {/*TODO add Constellation*/}
 
                     <Form.Group as={Row}>
                         <Form.Label column="true" sm="2">Status</Form.Label>

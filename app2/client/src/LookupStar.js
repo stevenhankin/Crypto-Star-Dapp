@@ -19,31 +19,39 @@ class LookupStar extends Component {
     handleChange(event) {
         this.setState({starName: event.target.value, requestStatus: "New"});
     }
+    //
+    // async createStar(starName, account) {
+    //     console.log(starName, account);
+    //     const {createStar, lookUptokenIdToStarInfo} = this.state.instance.methods;
+    //     // Create a Hash for the star based on its name
+    //     const starNameHash = createKeccakHash('keccak256').update(starName).digest();
+    //     // Call the contract to create a star claim with the specified name (and derived hash)
+    //     console.log(starName, starNameHash);
+    //     try {
+    //         console.log({from: account})
+    //         this.setState({requestStatus: "Submitted..."});
+    //         await createStar(starName, starNameHash).call({from: account});
+    //         this.setState({requestStatus: "Confirmed ✅"})
+    //     } catch (err) {
+    //         console.error("FAILURE!", err)
+    //         this.setState({requestStatus: "Failed"})
+    //     }
+    //     // // Get the star info back to display to the user
+    //     // const starInfo = await lookUptokenIdToStarInfo(starNameHash).call({from: account});
+    //     // console.log('starInfo', JSON.stringify(starInfo));
+    // }
+    //
 
-    async createStar(starName, account) {
-        console.log(starName, account);
-        const {createStar, lookUptokenIdToStarInfo} = this.state.instance.methods;
-        // Create a Hash for the star based on its name
-        const starNameHash = createKeccakHash('keccak256').update(starName).digest();
-        // Call the contract to create a star claim with the specified name (and derived hash)
-        console.log(starName, starNameHash);
-        try {
-            console.log({from: account})
-            this.setState({requestStatus: "Submitted..."});
-            await createStar(starName, starNameHash).call({from: account});
-            this.setState({requestStatus: "Confirmed ✅"})
-        } catch (err) {
-            console.error("FAILURE!", err)
-            this.setState({requestStatus: "Failed"})
-        }
-        // // Get the star info back to display to the user
-        // const starInfo = await lookUptokenIdToStarInfo(starNameHash).call({from: account});
-        // console.log('starInfo', JSON.stringify(starInfo));
+    async lookupStar  (lookId) {
+        const {lookUptokenIdToStarInfo} = this.state.instance.methods;
+        console.log('lookId', lookId);
+        const star = await lookUptokenIdToStarInfo(lookId).call({from: this.account});
+        console.log("Star is",star);
     }
 
     handleSubmit(event) {
         event.preventDefault();
-        this.createStar(this.state.starName, this.state.account)
+        this.lookId(this.state.starName, this.state.account)
             .then(() => console.log('created star'))
     }
 
