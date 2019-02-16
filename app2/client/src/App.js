@@ -56,9 +56,9 @@ class App extends Component {
                 // get accounts
                 accounts = await web3.eth.getAccounts();
                 console.log('Got accounts', accounts)
-                // const account = accounts[0];
+                const account = accounts[0];
                 // TODO: Remove hardcoding!!!
-                const account = "0xBE336f17483b8f9644961b6418fC8B9db4e50551";
+                // const account = "0xBE336f17483b8f9644961b6418fC8B9db4e50551";
                 console.log('Account is', account)
                 console.log('Instance is', instance)
                 const balance = web3.eth.getBalance(account);

@@ -2,18 +2,21 @@ import React, {useState} from "react";
 import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
+import InputGroup from "react-bootstrap/InputGroup";
 
-const RIPEMD160 = require('ripemd160')
+// const RIPEMD160 = require('ripemd160')
+import RIPEMD160 from 'ripemd160';
 
 function ClaimStar(props) {
 
     /* State Hooks */
     const [account] = useState(props.account);
     const [instance] = useState(props.instance);
+    const [starName, setStarName] = useState('');
+    const [tokenId, setTokenId] = useState('');
     const [requestStatus, setRequestStatus] = useState('');
 
     /* Custom state hooks */
-    const starName = useFormInput('');
     const story = useFormInput('');
     const declination = useFormInput(0);
     const raHours = useFormInput(0);
@@ -21,21 +24,69 @@ function ClaimStar(props) {
     const raSeconds = useFormInput(0);
     const constellation = useFormInput();
 
+
+    const constellations = ['Andromeda', 'Antlia', 'Apus', 'Aquarius', 'Aquila', 'Ara', 'Aries', 'Auriga', 'Boötes',
+        'Caelum', 'Camelopardalis', 'Cancer', 'Canes Venatici', 'Canis Major', 'Canis Minor', 'Capricornus', 'Carina',
+        'Cassiopeia', 'Centaurus', 'Cepheus', 'Cetus', 'Chamaeleon', 'Circinus', 'Columba', 'Coma Berenices',
+        'Corona Australis', 'Corona Borealis', 'Corvus', 'Crater', 'Crux', 'Cygnus', 'Delphinus', 'Dorado', 'Draco',
+        'Equuleus', 'Eridanus', 'Fornax', 'Gemini', 'Grus', 'Hercules', 'Horologium', 'Hydra', 'Hydrus', 'Indus',
+        'Lacerta', 'Leo', 'Leo Minor', 'Lepus', 'Libra', 'Lupus', 'Lynx', 'Lyra', 'Mensa', 'Microscopium', 'Monoceros',
+        'Musca', 'Norma', 'Octans', 'Ophiuchus', 'Orion', 'Pavo', 'Pegasus', 'Perseus', 'Phoenix', 'Pictor', 'Pisces',
+        'Piscis Austrinus', 'Puppis', 'Pyxis', 'Reticulum', 'Sagitta', 'Sagittarius', 'Scorpius', 'Sculptor', 'Scutum',
+        'Serpens', 'Sextans', 'Taurus', 'Telescopium', 'Triangulum', 'Triangulum Australe', 'Tucana', 'Ursa Major',
+        'Ursa Minor', 'Vela', 'Virgo', 'Volans', 'Vulpecula'
+    ];
+
+
+    /**
+     * Calculate a token from a shortened hash of the sanitized name
+     *
+     * @param name - name of star
+     */
+    function calculateToken(name) {
+        let shortHash = "";
+        if (name) {
+            // Ensure that the "same" name, irrespective of spacing
+            // or case, will yield the same token
+            const sanitizedStr = name.replace(/\W/g, '').toUpperCase();
+            shortHash = new RIPEMD160().update(sanitizedStr).digest('hex').slice(0, 10);
+            console.log(`${sanitizedStr} new hash ${shortHash}`)
+        } else {
+            // When the star name is empty, we don't want to display
+            // a token id because that would be confusing
+            shortHash = "";
+        }
+        console.log(`setting token, was ${tokenId}`)
+        setTokenId(shortHash);
+    }
+
+    function handleStarNameChange(e) {
+        const name = e.target.value;
+        setStarName(name);
+        calculateToken(name);
+    }
+
     // const callCreateStar = async (account) => {
-    async function     callCreateStar (account) {
-        const name = starName.value;
+    async function callCreateStar() {
+        const name = starName;
         console.log('CREATING A STAR!', name, account);
-        const {createStar, lookUptokenIdToStarInfo} = instance.methods;
+        const {createStar} = instance.methods;
         // Create a Hash for the star based on its name
-        const starNameHash = new RIPEMD160().update(name).digest();
+        console.log('TOKEN',tokenId);
+        const shortHash = tokenId; // new RIPEMD160().update(name).digest('hex').slice(0, 10);
         // Call the contract to create a star claim with the specified name (and derived hash)
-        console.log(name, starNameHash);
+        console.log(name, shortHash);
         try {
             console.log({from: account});
             setRequestStatus("Submitted...");
-            await createStar(name, starNameHash).call({from: account});
-            console.log(JSON.stringify(starNameHash));
-            setRequestStatus(`Confirmed ✅  (${name} has ID ${starNameHash.toString('hex')})`)
+            console.log('parsed hash is',parseInt(shortHash, 16))
+            console.log('account is',account);
+            console.log('name is',name);
+            const tokenId = 1;//parseInt(shortHash, 16);
+            console.log(`Claiming star ${name} for id ${tokenId} using account ${account}`);
+            await createStar(name, tokenId).call({from: account});
+            console.log(JSON.stringify(shortHash));
+            setRequestStatus(`Confirmed ✅  (${name} has ID ${shortHash})`)
         } catch (err) {
             console.error("FAILURE!", err)
             setRequestStatus("Failed")
@@ -62,7 +113,7 @@ function ClaimStar(props) {
         if (form.checkValidity() === false) {
             event.stopPropagation();
         } else {
-            callCreateStar(account)
+            callCreateStar()
                 .then(() => console.log('created star'))
         }
     };
@@ -75,14 +126,18 @@ function ClaimStar(props) {
 
                 <Form.Group as={Row}>
                     <Form.Label column="true" sm="2">Name</Form.Label>
-                    <Col sm="5">
-                        <Form.Control type="text" {...starName} placeholder="Enter the name of your star here"/>
+                    <Col sm={5}>
+                        <Form.Control type="text" onChange={handleStarNameChange}
+                                      placeholder="Enter the name of your star here"/>
+                    </Col>
+                    <Col sm={4}>
+                        <Form.Control readOnly  type="text" value={tokenId}/>
                     </Col>
                 </Form.Group>
 
                 <Form.Group as={Row} controlId="validationStory">
                     <Form.Label column="true" sm="2">Story</Form.Label>
-                    <Col sm="5">
+                    <Col sm="9">
                         <Form.Control required type="text" {...story}
                                       placeholder="Mention why this star is important to you"/>
                         <Form.Control.Feedback type="invalid">Looks good!</Form.Control.Feedback>
@@ -91,123 +146,50 @@ function ClaimStar(props) {
 
                 <Form.Group as={Row}>
                     <Form.Label column="true" sm="2">Declination</Form.Label>
-                    <Col sm="5">
+                    <Col sm="3" md="2">
                         <Form.Control {...declination} />
                     </Col>
                 </Form.Group>
 
                 <Form.Group as={Row}>
                     <Form.Label column="true" sm="2">Right Ascension</Form.Label>
-                    <Col sm="2">
-                        <Form.Control type="text" {...raHours}/>
+                    <Col sm="3" md="2">
+                        <InputGroup>
+                            <InputGroup.Append>
+                                <InputGroup.Text id="hrs-addon">hrs</InputGroup.Text>
+                            </InputGroup.Append>
+                            <Form.Control type="text" aria-describedby="hrs-addon" {...raHours}/>
+                        </InputGroup>
                     </Col>
-                    <Col sm="2">
-                        <Form.Control type="text" {...raMinutes}/>
+                    <Col sm="3" md="2">
+                        <InputGroup>
+                            <InputGroup.Append>
+                                <InputGroup.Text id="sec-addon">sec</InputGroup.Text>
+                            </InputGroup.Append>
+                            <Form.Control type="text" {...raMinutes}/>
+                        </InputGroup>
                     </Col>
-                    <Col sm="2">
-                        <Form.Control type="text" {...raSeconds}/>
+                    <Col sm="3" md="2">
+                        <InputGroup>
+                            <InputGroup.Append>
+                                <InputGroup.Text id="min-addon">min</InputGroup.Text>
+                            </InputGroup.Append>
+                            <Form.Control type="text" {...raSeconds}/>
+                        </InputGroup>
                     </Col>
                 </Form.Group>
 
                 <Form.Group as={Row}>
                     <Form.Label column="true" sm="2">Constellation</Form.Label>
-                    <Col sm="5">
+                    <Col sm={9} md={6}>
                         <Form.Control as="select" {...constellation}>
-                            <option>Andromeda</option>
-                            <option>Antlia</option>
-                            <option>Apus</option>
-                            <option>Aquarius</option>
-                            <option>Aquila</option>
-                            <option>Ara</option>
-                            <option>Aries</option>
-                            <option>Auriga</option>
-                            <option>Boötes</option>
-                            <option>Caelum</option>
-                            <option>Camelopardalis</option>
-                            <option>Cancer</option>
-                            <option>Canes Venatici</option>
-                            <option>Canis Major</option>
-                            <option>Canis Minor</option>
-                            <option>Capricornus</option>
-                            <option>Carina</option>
-                            <option>Cassiopeia</option>
-                            <option>Centaurus</option>
-                            <option>Cepheus</option>
-                            <option>Cetus</option>
-                            <option>Chamaeleon</option>
-                            <option>Circinus</option>
-                            <option>Columba</option>
-                            <option>Coma Berenices</option>
-                            <option>Corona Australis</option>
-                            <option>Corona Borealis</option>
-                            <option>Corvus</option>
-                            <option>Crater</option>
-                            <option>Crux</option>
-                            <option>Cygnus</option>
-                            <option>Delphinus</option>
-                            <option>Dorado</option>
-                            <option>Draco</option>
-                            <option>Equuleus</option>
-                            <option>Eridanus</option>
-                            <option>Fornax</option>
-                            <option>Gemini</option>
-                            <option>Grus</option>
-                            <option>Hercules</option>
-                            <option>Horologium</option>
-                            <option>Hydra</option>
-                            <option>Hydrus</option>
-                            <option>Indus</option>
-                            <option>Lacerta</option>
-                            <option>Leo</option>
-                            <option>Leo Minor</option>
-                            <option>Lepus</option>
-                            <option>Libra</option>
-                            <option>Lupus</option>
-                            <option>Lynx</option>
-                            <option>Lyra</option>
-                            <option>Mensa</option>
-                            <option>Microscopium</option>
-                            <option>Monoceros</option>
-                            <option>Musca</option>
-                            <option>Norma</option>
-                            <option>Octans</option>
-                            <option>Ophiuchus</option>
-                            <option>Orion</option>
-                            <option>Pavo</option>
-                            <option>Pegasus</option>
-                            <option>Perseus</option>
-                            <option>Phoenix</option>
-                            <option>Pictor</option>
-                            <option>Pisces</option>
-                            <option>Piscis Austrinus</option>
-                            <option>Puppis</option>
-                            <option>Pyxis</option>
-                            <option>Reticulum</option>
-                            <option>Sagitta</option>
-                            <option>Sagittarius</option>
-                            <option>Scorpius</option>
-                            <option>Sculptor</option>
-                            <option>Scutum</option>
-                            <option>Serpens</option>
-                            <option>Sextans</option>
-                            <option>Taurus</option>
-                            <option>Telescopium</option>
-                            <option>Triangulum</option>
-                            <option>Triangulum Australe</option>
-                            <option>Tucana</option>
-                            <option>Ursa Major</option>
-                            <option>Ursa Minor</option>
-                            <option>Vela</option>
-                            <option>Virgo</option>
-                            <option>Volans</option>
-                            <option>Vulpecula</option>
-
+                            {constellations.map(x => <option key={x}>{x}</option>)}
                         </Form.Control>
                     </Col>
                 </Form.Group>
 
                 <Col sm="2">
-                    <input type="submit" value="Claim now!" disabled={!starName.value}/>
+                    <input type="submit" value="Claim now!" disabled={!starName}/>
                 </Col>
 
                 <Form.Group as={Row}>

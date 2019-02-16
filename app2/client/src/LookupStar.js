@@ -1,90 +1,203 @@
-import React, {Component} from "react";
-// import Container from 'react-bootstrap/Container';
+import React, {useState} from "react";
 import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
-import Container from "react-bootstrap/Container";
+import InputGroup from "react-bootstrap/InputGroup";
 
-const createKeccakHash = require('keccak')
+// const RIPEMD160 = require('ripemd160')
+import RIPEMD160 from 'ripemd160';
 
-class LookupStar extends Component {
+function LookupStar(props) {
 
-    constructor(props) {
-        super(props);
-        this.state = {starName: props.name, instance: props.instance, account: props.account, requestStatus: "New"};
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-    }
+    /* State Hooks */
+    const [account] = useState(props.account);
+    const [instance] = useState(props.instance);
+    const [starName, setStarName] = useState('');
+    const [requestStatus, setRequestStatus] = useState('');
 
-    handleChange(event) {
-        this.setState({starName: event.target.value, requestStatus: "New"});
-    }
-    //
-    // async createStar(starName, account) {
-    //     console.log(starName, account);
-    //     const {createStar, lookUptokenIdToStarInfo} = this.state.instance.methods;
-    //     // Create a Hash for the star based on its name
-    //     const starNameHash = createKeccakHash('keccak256').update(starName).digest();
-    //     // Call the contract to create a star claim with the specified name (and derived hash)
-    //     console.log(starName, starNameHash);
-    //     try {
-    //         console.log({from: account})
-    //         this.setState({requestStatus: "Submitted..."});
-    //         await createStar(starName, starNameHash).call({from: account});
-    //         this.setState({requestStatus: "Confirmed ✅"})
-    //     } catch (err) {
-    //         console.error("FAILURE!", err)
-    //         this.setState({requestStatus: "Failed"})
+    /* Custom state hooks */
+    const tokenHash = useFormInput('');
+    const story = useFormInput('');
+    const declination = useFormInput(0);
+    const raHours = useFormInput(0);
+    const raMinutes = useFormInput(0);
+    const raSeconds = useFormInput(0);
+    const constellation = useFormInput();
+
+
+    /**
+     * Calculate a token from a shortened hash of the sanitized name
+     *
+     * @param name - name of star
+     */
+    // function calculateToken(name) {
+    //     let shortHash = "";
+    //     if (name) {
+    //         // Ensure that the "same" name, irrespective of spacing
+    //         // or case, will yield the same token
+    //         const sanitizedStr = name.replace(/\W/g, '').toUpperCase();
+    //         shortHash = new RIPEMD160().update(sanitizedStr).digest('hex').slice(0, 10);
+    //         console.log(`${sanitizedStr} new hash ${shortHash}`)
+    //     } else {
+    //         // When the star name is empty, we don't want to display
+    //         // a token id because that would be confusing
+    //         shortHash = "";
     //     }
-    //     // // Get the star info back to display to the user
-    //     // const starInfo = await lookUptokenIdToStarInfo(starNameHash).call({from: account});
-    //     // console.log('starInfo', JSON.stringify(starInfo));
+    //     console.log(`setting token, was ${tokenId}`)
+    //     setTokenId(shortHash);
     // }
-    //
 
-    async lookupStar  (lookId) {
-        const {lookUptokenIdToStarInfo} = this.state.instance.methods;
-        console.log('lookId', lookId);
-        const star = await lookUptokenIdToStarInfo(lookId).call({from: this.account});
-        console.log("Star is",star);
+    // function handleStarNameChange(e) {
+    //     const name = e.target.value;
+    //     setStarName(name);
+    //     calculateToken(name);
+    // }
+
+    // const callCreateStar = async (account) => {
+    async function lookupStarByToken() {
+
+        // const name = starName.value;
+        const {lookUptokenIdToStarInfo,tokenIdToStarInfo} = instance.methods;
+        const tokenId = 1;//parseInt(tokenHash.value, 16);
+        console.log (`Looking up star for token ${tokenId} from account ${account}`)
+        let starInfo = await lookUptokenIdToStarInfo(tokenId).call({from:account});
+        // let starInfo = await tokenIdToStarInfo.call(tokenId);
+        // console.log('starInfo', JSON.stringify(starInfo));
+
+        console.log(starInfo);
+
+        // // Create a Hash for the star based on its name
+        // const shortHash = new RIPEMD160().update(name).digest('hex').slice(0, 10);
+        // // Call the contract to create a star claim with the specified name (and derived hash)
+        // console.log(name, shortHash);
+        // try {
+        //     console.log({from: account});
+        //     setRequestStatus("Submitted...");
+        //     await createStar(name, parseInt(shortHash, 16)).call({from: account});
+        //     console.log(JSON.stringify(shortHash));
+        //     setRequestStatus(`Confirmed ✅  (${name} has ID ${shortHash})`)
+        // } catch (err) {
+        //     console.error("FAILURE!", err)
+        //     setRequestStatus("Failed")
+        // }
+        // // Get the star info back to display to the user
+        // const starInfo = await lookUptokenIdToStarInfo(starNameHash).call({from: account});
+        // console.log('starInfo', JSON.stringify(starInfo));
     }
 
-    handleSubmit(event) {
+    function useFormInput(initialValue) {
+        const [value, setValue] = useState(initialValue);
+
+        function onChange(e) {
+            setValue(e.target.value)
+        }
+
+        return {value, onChange};
+    }
+
+    const handleSubmit = (event) => {
+
+        const form = event.currentTarget;
         event.preventDefault();
-        this.lookId(this.state.starName, this.state.account)
-            .then(() => console.log('created star'))
-    }
+        if (form.checkValidity() === false) {
+            event.stopPropagation();
+        } else {
+            lookupStarByToken()
+                .then(() => console.log('found star'))
+        }
+    };
 
-    render() {
-        return (
-            <div>
-                {/*<Container>*/}
-                {/*<h2>Claim a star</h2>*/}
-                <h2>Lookup Star</h2>
-                <Form onSubmit={this.handleSubmit}>
+    // render() {
+    return (
+        <div>
+            <h2>Find a star</h2>
+            <Form onSubmit={handleSubmit}>
 
-                    <Form.Group as={Row}>
-                        <Form.Label column="true" sm="2">Name</Form.Label>
-                        <Col sm="5">
-                            <Form.Control column="true" sm="5" type="text" name="starName"
-                                          onChange={this.handleChange}/>
-                        </Col>
-                        <Col sm="2">
-                            <input type="submit" value="Claim now!" disabled={!this.state.starName}/>
-                        </Col>
-                    </Form.Group>
+                <Form.Group as={Row}>
+                    <Form.Label column="true" sm="2">Token</Form.Label>
+                    <Col sm={5}>
+                        <Form.Control type="text" {...tokenHash}
+                                      placeholder="Enter the token id for the star you are interested in"/>
+                    </Col>
+                </Form.Group>
 
-                    <Form.Group as={Row}>
-                        <Form.Label column="true" sm="2">Status</Form.Label>
-                        <Form.Label column="true" sm="5">{this.state.requestStatus}</Form.Label>
-                    </Form.Group>
+                <Col sm="2">
+                    <input type="submit" value="Lookup" disabled={!tokenHash.value}/>
+                </Col>
 
-                </Form>
+                {/*<Form.Group as={Row}>*/}
+                    {/*<Form.Label column="true" sm="2">Name</Form.Label>*/}
+                    {/*<Col sm={5}>*/}
+                        {/*<Form.Control type="text" onChange={handleStarNameChange}*/}
+                                      {/*placeholder="Enter the name of your star here"/>*/}
+                    {/*</Col>*/}
+                {/*</Form.Group>*/}
 
-                {/*// </Container>*/}
-            </div>
-        );
-    }
+                {/*<Form.Group as={Row} controlId="validationStory">*/}
+                    {/*<Form.Label column="true" sm="2">Story</Form.Label>*/}
+                    {/*<Col sm="9">*/}
+                        {/*<Form.Control required type="text" {...story}*/}
+                                      {/*placeholder="Mention why this star is important to you"/>*/}
+                        {/*<Form.Control.Feedback type="invalid">Looks good!</Form.Control.Feedback>*/}
+                    {/*</Col>*/}
+                {/*</Form.Group>*/}
+
+                {/*<Form.Group as={Row}>*/}
+                    {/*<Form.Label column="true" sm="2">Declination</Form.Label>*/}
+                    {/*<Col sm="3" md="2">*/}
+                        {/*<Form.Control {...declination} />*/}
+                    {/*</Col>*/}
+                {/*</Form.Group>*/}
+
+                {/*<Form.Group as={Row}>*/}
+                    {/*<Form.Label column="true" sm="2">Right Ascension</Form.Label>*/}
+                    {/*<Col sm="3" md="2">*/}
+                        {/*<InputGroup>*/}
+                            {/*<InputGroup.Append>*/}
+                                {/*<InputGroup.Text id="hrs-addon">hrs</InputGroup.Text>*/}
+                            {/*</InputGroup.Append>*/}
+                            {/*<Form.Control type="text" aria-describedby="hrs-addon" {...raHours}/>*/}
+                        {/*</InputGroup>*/}
+                    {/*</Col>*/}
+                    {/*<Col sm="3" md="2">*/}
+                        {/*<InputGroup>*/}
+                            {/*<InputGroup.Append>*/}
+                                {/*<InputGroup.Text id="sec-addon">sec</InputGroup.Text>*/}
+                            {/*</InputGroup.Append>*/}
+                            {/*<Form.Control type="text" {...raMinutes}/>*/}
+                        {/*</InputGroup>*/}
+                    {/*</Col>*/}
+                    {/*<Col sm="3" md="2">*/}
+                        {/*<InputGroup>*/}
+                            {/*<InputGroup.Append>*/}
+                                {/*<InputGroup.Text id="min-addon">min</InputGroup.Text>*/}
+                            {/*</InputGroup.Append>*/}
+                            {/*<Form.Control type="text" {...raSeconds}/>*/}
+                        {/*</InputGroup>*/}
+                    {/*</Col>*/}
+                {/*</Form.Group>*/}
+
+                {/*<Form.Group as={Row}>*/}
+                    {/*<Form.Label column="true" sm="2">Constellation</Form.Label>*/}
+                    {/*<Col sm={9} md={6}>*/}
+                        {/*<Form.Control as="select" {...constellation}>*/}
+                            {/*{constellations.map(x => <option>{x}</option>)}*/}
+                        {/*</Form.Control>*/}
+                    {/*</Col>*/}
+                {/*</Form.Group>*/}
+
+
+                {/*<Form.Group as={Row}>*/}
+                    {/*<Form.Label column="true" sm="2">Status</Form.Label>*/}
+                    {/*<Form.Label column="true" sm="5">{requestStatus}</Form.Label>*/}
+                {/*</Form.Group>*/}
+
+            </Form>
+
+        </div>
+    );
 }
 
 export default LookupStar;
+
+
