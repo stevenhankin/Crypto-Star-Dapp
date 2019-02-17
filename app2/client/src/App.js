@@ -51,7 +51,6 @@ class App extends Component {
                     starNotaryArtifact.abi,
                     deployedNetwork.address,
                 );
-                // console.log('@4',instance.deployed())
 
                 // get accounts
                 accounts = await web3.eth.getAccounts();

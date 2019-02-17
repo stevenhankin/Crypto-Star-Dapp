@@ -53,17 +53,11 @@ function LookupStar(props) {
     //     calculateToken(name);
     // }
 
-    // const callCreateStar = async (account) => {
     async function lookupStarByToken() {
-
-        // const name = starName.value;
-        const {lookUptokenIdToStarInfo,tokenIdToStarInfo} = instance.methods;
-        const tokenId = 1;//parseInt(tokenHash.value, 16);
+        const {lookUptokenIdToStarInfo} = instance.methods;
+        const tokenId = parseInt(tokenHash.value, 16);
         console.log (`Looking up star for token ${tokenId} from account ${account}`)
-        let starInfo = await lookUptokenIdToStarInfo(tokenId).call({from:account});
-        // let starInfo = await tokenIdToStarInfo.call(tokenId);
-        // console.log('starInfo', JSON.stringify(starInfo));
-
+        let starInfo = await lookUptokenIdToStarInfo(tokenId).call();
         console.log(starInfo);
 
         // // Create a Hash for the star based on its name

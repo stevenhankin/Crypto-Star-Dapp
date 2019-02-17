@@ -3,8 +3,8 @@ import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import InputGroup from "react-bootstrap/InputGroup";
+import Alert from "react-bootstrap/Alert";
 
-// const RIPEMD160 = require('ripemd160')
 import RIPEMD160 from 'ripemd160';
 
 function ClaimStar(props) {
@@ -15,6 +15,7 @@ function ClaimStar(props) {
     const [starName, setStarName] = useState('');
     const [tokenId, setTokenId] = useState('');
     const [requestStatus, setRequestStatus] = useState('');
+    const [alert, setAlert] = useState({});
 
     /* Custom state hooks */
     const story = useFormInput('');
@@ -68,33 +69,36 @@ function ClaimStar(props) {
 
     // const callCreateStar = async (account) => {
     async function callCreateStar() {
-        const name = starName;
-        console.log('CREATING A STAR!', name, account);
-        const {createStar} = instance.methods;
-        // Create a Hash for the star based on its name
-        console.log('TOKEN',tokenId);
-        const shortHash = tokenId; // new RIPEMD160().update(name).digest('hex').slice(0, 10);
-        // Call the contract to create a star claim with the specified name (and derived hash)
-        console.log(name, shortHash);
-        try {
-            console.log({from: account});
-            setRequestStatus("Submitted...");
-            console.log('parsed hash is',parseInt(shortHash, 16))
-            console.log('account is',account);
-            console.log('name is',name);
-            const tokenId = 1;//parseInt(shortHash, 16);
-            console.log(`Claiming star ${name} for id ${tokenId} using account ${account}`);
-            await createStar(name, tokenId).call({from: account});
-            console.log(JSON.stringify(shortHash));
-            setRequestStatus(`Confirmed ✅  (${name} has ID ${shortHash})`)
-        } catch (err) {
-            console.error("FAILURE!", err)
-            setRequestStatus("Failed")
+        const {createStar, lookUptokenIdToStarInfo} = instance.methods;
+        console.log('TOKEN', tokenId);
+        const intTokenId = parseInt(tokenId, 16);
+        console.log('checking starInfo..', intTokenId);
+        // Don't attempt to create a star that already exists
+        // because it will just get rejected by the StarNotary contract anyway
+        let starInfo = await lookUptokenIdToStarInfo(intTokenId).call();
+        if (starInfo.length > 0) {
+            alert('Already exists');
+        } else {
+            console.log('starInfo:', starInfo);
+            // Call the contract to create a star claim with the specified name (and derived hash)
+            try {
+                setRequestStatus("Submitted...");
+                // await createStar(name, tokenId).call({from: account});
+                let receipt = await createStar(starName, intTokenId).send({from: account, gas: 500000});
+                console.log('receipt', receipt);
+                if (receipt.transactionHash) {
+                    setAlert({msg:`Confirmed! Created with token ${tokenId}`, variant:"primary"});
+                    setRequestStatus(`Confirmed ✅  (${starName} has ID ${tokenId}, with int id of ${intTokenId})`)
+                }
+            } catch (err) {
+                console.error("FAILURE!", err)
+                setRequestStatus("Failed")
+            }
+            // // Get the star info back to display to the user
+            // const starInfo = await lookUptokenIdToStarInfo(starNameHash).call({from: account});
+            // console.log('starInfo', JSON.stringify(starInfo));
         }
-        // // Get the star info back to display to the user
-        // const starInfo = await lookUptokenIdToStarInfo(starNameHash).call({from: account});
-        // console.log('starInfo', JSON.stringify(starInfo));
-    };
+    }
 
     function useFormInput(initialValue) {
         const [value, setValue] = useState(initialValue);
@@ -118,6 +122,8 @@ function ClaimStar(props) {
         }
     };
 
+    const hideToken = tokenId ? "" : "hidden";
+
     // render() {
     return (
         <div>
@@ -126,13 +132,17 @@ function ClaimStar(props) {
 
                 <Form.Group as={Row}>
                     <Form.Label column="true" sm="2">Name</Form.Label>
-                    <Col sm={5}>
-                        <Form.Control type="text" onChange={handleStarNameChange}
-                                      placeholder="Enter the name of your star here"/>
-                    </Col>
                     <Col sm={4}>
-                        <Form.Control readOnly  type="text" value={tokenId}/>
+                        <InputGroup>
+
+                            <Form.Control type="text" onChange={handleStarNameChange}
+                                          placeholder="Enter the name of your star here"/>
+                            <InputGroup.Append>
+                                <InputGroup.Text>{tokenId || "Token ID"}</InputGroup.Text>
+                            </InputGroup.Append>
+                        </InputGroup>
                     </Col>
+
                 </Form.Group>
 
                 <Form.Group as={Row} controlId="validationStory">
@@ -188,9 +198,17 @@ function ClaimStar(props) {
                     </Col>
                 </Form.Group>
 
-                <Col sm="2">
-                    <input type="submit" value="Claim now!" disabled={!starName}/>
-                </Col>
+                <Form.Group as={Row}>
+                    <Col sm="2">
+                        <input type="submit" value="Claim now!" disabled={!starName}/>
+                    </Col>
+
+                    <Col sm="6">
+                        <Alert variant={alert.variant}>
+                            {alert.msg}
+                        </Alert>
+                    </Col>
+                </Form.Group>
 
                 <Form.Group as={Row}>
                     <Form.Label column="true" sm="2">Status</Form.Label>
