@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
@@ -14,7 +14,6 @@ function ClaimStar(props) {
     const [instance] = useState(props.instance);
     const [starName, setStarName] = useState('');
     const [tokenId, setTokenId] = useState('');
-    const [requestStatus, setRequestStatus] = useState('');
     const [alert, setAlert] = useState({});
 
     /* Custom state hooks */
@@ -38,6 +37,18 @@ function ClaimStar(props) {
         'Ursa Minor', 'Vela', 'Virgo', 'Volans', 'Vulpecula'
     ];
 
+
+    /**
+     * Display a bootstrap alert for info
+     * Timesout and disappears after a few seconds
+     * @param msgObj
+     */
+    function alertMsg(msgObj) {
+        setAlert(msgObj);
+        setTimeout(() => {
+            setAlert({})
+        }, 3000);
+    }
 
     /**
      * Calculate a token from a shortened hash of the sanitized name
@@ -67,32 +78,26 @@ function ClaimStar(props) {
         calculateToken(name);
     }
 
-    // const callCreateStar = async (account) => {
     async function callCreateStar() {
         const {createStar, lookUptokenIdToStarInfo} = instance.methods;
-        console.log('TOKEN', tokenId);
         const intTokenId = parseInt(tokenId, 16);
-        console.log('checking starInfo..', intTokenId);
         // Don't attempt to create a star that already exists
         // because it will just get rejected by the StarNotary contract anyway
         let starInfo = await lookUptokenIdToStarInfo(intTokenId).call();
         if (starInfo.length > 0) {
-            alert('Already exists');
+            alertMsg({msg: `Star already claimed with token ${tokenId}`, variant: "primary"});
         } else {
             console.log('starInfo:', starInfo);
             // Call the contract to create a star claim with the specified name (and derived hash)
             try {
-                setRequestStatus("Submitted...");
+                alertMsg({msg: "Submitted...", variant: "info"});
                 // await createStar(name, tokenId).call({from: account});
                 let receipt = await createStar(starName, intTokenId).send({from: account, gas: 500000});
-                console.log('receipt', receipt);
                 if (receipt.transactionHash) {
-                    setAlert({msg:`Confirmed! Created with token ${tokenId}`, variant:"primary"});
-                    setRequestStatus(`Confirmed ✅  (${starName} has ID ${tokenId}, with int id of ${intTokenId})`)
+                    alertMsg({msg: `Confirmed ✅ Created with token ${tokenId}`, variant: "success"});
                 }
             } catch (err) {
-                console.error("FAILURE!", err)
-                setRequestStatus("Failed")
+                alertMsg({msg: "Failed", variant: "primary"})
             }
             // // Get the star info back to display to the user
             // const starInfo = await lookUptokenIdToStarInfo(starNameHash).call({from: account});
@@ -111,7 +116,6 @@ function ClaimStar(props) {
     }
 
     const handleSubmit = (event) => {
-
         const form = event.currentTarget;
         event.preventDefault();
         if (form.checkValidity() === false) {
@@ -122,9 +126,7 @@ function ClaimStar(props) {
         }
     };
 
-    const hideToken = tokenId ? "" : "hidden";
 
-    // render() {
     return (
         <div>
             <h2>Claim</h2>
@@ -208,11 +210,6 @@ function ClaimStar(props) {
                             {alert.msg}
                         </Alert>
                     </Col>
-                </Form.Group>
-
-                <Form.Group as={Row}>
-                    <Form.Label column="true" sm="2">Status</Form.Label>
-                    <Form.Label column="true" sm="5">{requestStatus}</Form.Label>
                 </Form.Group>
 
             </Form>

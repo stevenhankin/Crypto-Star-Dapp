@@ -7894,12 +7894,12 @@
         }
       },
       "links": {},
-      "address": "0xe89B7405ceB62784a05916d7F0D88ECEcE30Facb",
-      "transactionHash": "0xdb0724146d1af90edd530a5d50ccf31d6d8c0be81fcf8bba1aec8771ab8eee20"
+      "address": "0xcC0F740B48343E46cCaEeA2E456d5D65F3Bbb2E7",
+      "transactionHash": "0xf40f0aa1da2ffbe15bb8b06f3096182df64bfdd24a48c4c38d9b9f2f3d9661e2"
     }
   },
   "schemaVersion": "3.0.2",
-  "updatedAt": "2019-02-17T18:39:11.525Z",
+  "updatedAt": "2019-02-17T22:18:56.661Z",
   "devdoc": {
     "methods": {
       "approve(address,uint256)": {
