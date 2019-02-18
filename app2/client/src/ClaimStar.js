@@ -150,9 +150,8 @@ function ClaimStar(props) {
                 <Form.Group as={Row} controlId="validationStory">
                     <Form.Label column="true" sm="2">Story</Form.Label>
                     <Col sm="9">
-                        <Form.Control required type="text" {...story}
+                        <Form.Control type="text" {...story}
                                       placeholder="Mention why this star is important to you"/>
-                        <Form.Control.Feedback type="invalid">Looks good!</Form.Control.Feedback>
                     </Col>
                 </Form.Group>
 
