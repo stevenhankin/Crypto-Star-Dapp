@@ -1,82 +1,128 @@
-import React, {Component} from "react";
-// import Container from 'react-bootstrap/Container';
+import React, {useState} from "react";
 import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
-import Container from "react-bootstrap/Container";
+import Button from "react-bootstrap/Button";
+import Alert from "react-bootstrap/Alert";
 
-const createKeccakHash = require('keccak')
+function SellStar(props) {
 
-class SellStar extends Component {
+    /* State Hooks */
+    const [account] = useState(props.account);
+    const [instance] = useState(props.instance);
+    const [alert, setAlert] = useState([]);
 
-    constructor(props) {
-        super(props);
-        this.state = {starName: props.name, instance: props.instance, account: props.account, requestStatus: "New"};
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
+    /* Custom state hooks */
+    const tokenHash = useFormInput('');
+    const starPrice = useFormInput('');
+
+    /**
+     * Display a bootstrap alert for info
+     * Timesout and disappears after a few seconds
+     * @param msgObj
+     */
+    function alertMsg(msgObj) {
+        const futureTimeout = Date.now() + 4000;
+        console.log('adding a msg', msgObj)
+        const newAlertList = alert.concat({timeout: futureTimeout, ...msgObj});
+        setAlert(newAlertList);
+        setTimeout(() => {
+            setAlert(alert.filter(a => a.timeout > Date.now()));
+        }, 5000);
     }
 
-    handleChange(event) {
-        this.setState({starName: event.target.value, requestStatus: "New"});
-    }
-
-    async createStar(starName, account) {
-        console.log(starName, account);
-        const {createStar, lookUptokenIdToStarInfo} = this.state.instance.methods;
-        // Create a Hash for the star based on its name
-        const starNameHash = createKeccakHash('keccak256').update(starName).digest();
-        // Call the contract to create a star claim with the specified name (and derived hash)
-        console.log(starName, starNameHash);
-        try {
-            console.log({from: account})
-            this.setState({requestStatus: "Submitted..."});
-            await createStar(starName, starNameHash).call({from: account});
-            this.setState({requestStatus: "Confirmed ✅"})
-        } catch (err) {
-            console.error("FAILURE!", err)
-            this.setState({requestStatus: "Failed"})
+    /**
+     * Sell a star via the appropriate method on the contract
+     * but first make some simple data checks to prevent
+     * unnecessary gas burning
+     * @return {Promise<void>}
+     */
+    async function sellStar() {
+        const {lookUptokenIdToStarInfo, putStarUpForSale} = instance.methods;
+        const tokenId = parseInt(tokenHash.value, 16);
+        const price = parseInt(starPrice.value);
+        if (isNaN(tokenId)) {
+            alertMsg({msg: `${tokenHash.value} is not a valid ID`, variant: 'warning'});
+        } else {
+            if (isNaN(price) || price <= 0) {
+                alertMsg({msg: `The price is not valid`, variant: 'warning'});
+            } else {
+                // Let's see if the star exists
+                const starInfo = await lookUptokenIdToStarInfo(tokenId).call();
+                if (starInfo) {
+                    await putStarUpForSale(tokenId, price).send({from: account, gas: 500000});
+                    alertMsg({msg: `✅ ${starInfo} has been put up for sale`, variant: 'success'});
+                } else {
+                    alertMsg({msg: `${tokenHash.value} doesn't exist`, variant: 'warning'});
+                }
+            }
         }
-        // // Get the star info back to display to the user
-        // const starInfo = await lookUptokenIdToStarInfo(starNameHash).call({from: account});
-        // console.log('starInfo', JSON.stringify(starInfo));
     }
 
-    handleSubmit(event) {
+    /**
+     * Generic form input state hook
+     * @param initialValue
+     * @return {{onChange: onChange, value: any}}
+     */
+    function useFormInput(initialValue) {
+        const [value, setValue] = useState(initialValue);
+        function onChange(e) {
+            setValue(e.target.value);
+        }
+        return {value, onChange};
+    }
+
+    /**
+     * Sell the star when the button is clicked
+     * @param event
+     */
+    const handleSell = (event) => {
         event.preventDefault();
-        this.createStar(this.state.starName, this.state.account)
-            .then(() => console.log('created star'))
-    }
+        sellStar().then(() => console.log('put star up for sale'))
+    };
 
-    render() {
-        return (
-            <div>
-                {/*<Container>*/}
-                {/*<h2>Claim a star</h2>*/}
-                <h2>Sell Star</h2>
-                <Form onSubmit={this.handleSubmit}>
+    return (
+        <div>
+            <h2>Sell a star</h2>
+            <Form onSubmit={handleSell}>
 
-                    <Form.Group as={Row}>
-                        <Form.Label column="true" sm="2">Name</Form.Label>
-                        <Col sm="5">
-                            <Form.Control column="true" sm="5" type="text" name="starName"
-                                          onChange={this.handleChange}/>
-                        </Col>
-                        <Col sm="2">
-                            <input type="submit" value="Claim now!" disabled={!this.state.starName}/>
-                        </Col>
-                    </Form.Group>
+                <Form.Group as={Row}>
+                    <Form.Label column="true" sm="2">Token</Form.Label>
+                    <Col sm={5}>
+                        <Form.Control type="text" {...tokenHash}
+                                      placeholder="ID of your star"/>
+                    </Col>
+                </Form.Group>
 
-                    <Form.Group as={Row}>
-                        <Form.Label column="true" sm="2">Status</Form.Label>
-                        <Form.Label column="true" sm="5">{this.state.requestStatus}</Form.Label>
-                    </Form.Group>
+                <Form.Group as={Row}>
+                    <Form.Label column="true" sm="2">Price</Form.Label>
+                    <Col sm={5}>
+                        <Form.Control type="text" {...starPrice}
+                                      placeholder="Price > 0"/>
+                    </Col>
+                </Form.Group>
 
-                </Form>
+                <Form.Group as={Row}>
+                    <Form.Label column="true" sm="2">
+                        <Button type="submit" disabled={!tokenHash.value}>Sell Star</Button>
+                    </Form.Label>
 
-                {/*// </Container>*/}
-            </div>
-        );
-    }
+                    <Col sm="6">
+                        {alert.map((item, i) => {
+                            return <Alert key={i} variant={item.variant}>
+                                {item.msg}
+                            </Alert>
+
+                        })}
+                    </Col>
+                </Form.Group>
+
+            </Form>
+
+        </div>
+    );
 }
 
+
 export default SellStar;
+

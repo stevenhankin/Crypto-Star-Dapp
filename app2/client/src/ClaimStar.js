@@ -163,7 +163,7 @@ function ClaimStar(props) {
                         <InputGroup>
 
                             <Form.Control type="text" onChange={handleStarNameChange}
-                                          placeholder="Enter the name of your star here"/>
+                                          placeholder="Enter name of your star"/>
                             <InputGroup.Append>
                                 <InputGroup.Text>{tokenId || "Token ID"}</InputGroup.Text>
                             </InputGroup.Append>

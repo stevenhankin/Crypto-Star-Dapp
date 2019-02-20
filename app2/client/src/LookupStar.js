@@ -36,24 +36,6 @@ function LookupStar(props) {
             let starInfo = await lookUptokenIdToStarInfo(tokenId).call();
             setStarName(starInfo);
         }
-
-        // // Create a Hash for the star based on its name
-        // const shortHash = new RIPEMD160().update(name).digest('hex').slice(0, 10);
-        // // Call the contract to create a star claim with the specified name (and derived hash)
-        // console.log(name, shortHash);
-        // try {
-        //     console.log({from: account});
-        //     setRequestStatus("Submitted...");
-        //     await createStar(name, parseInt(shortHash, 16)).call({from: account});
-        //     console.log(JSON.stringify(shortHash));
-        //     setRequestStatus(`Confirmed ✅  (${name} has ID ${shortHash})`)
-        // } catch (err) {
-        //     console.error("FAILURE!", err)
-        //     setRequestStatus("Failed")
-        // }
-        // // Get the star info back to display to the user
-        // const starInfo = await lookUptokenIdToStarInfo(starNameHash).call({from: account});
-        // console.log('starInfo', JSON.stringify(starInfo));
     }
 
     function useFormInput(initialValue) {
@@ -88,7 +70,7 @@ function LookupStar(props) {
                     <Form.Label column="true" sm="2">Token</Form.Label>
                     <Col sm={5}>
                         <Form.Control type="text" {...tokenHash}
-                                      placeholder="Enter the token id for the star you are interested in"/>
+                                      placeholder="ID of star you're interested in"/>
                     </Col>
                 </Form.Group>
 
