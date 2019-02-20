@@ -6,6 +6,7 @@ import InputGroup from "react-bootstrap/InputGroup";
 import Alert from "react-bootstrap/Alert";
 
 import RIPEMD160 from 'ripemd160';
+import Button from "react-bootstrap/Button";
 
 function ClaimStar(props) {
 
@@ -14,7 +15,7 @@ function ClaimStar(props) {
     const [instance] = useState(props.instance);
     const [starName, setStarName] = useState('');
     const [tokenId, setTokenId] = useState('');
-    const [alert, setAlert] = useState({});
+    const [alert, setAlert] = useState([]);
 
     /* Custom state hooks */
     const story = useFormInput('');
@@ -44,14 +45,17 @@ function ClaimStar(props) {
      * @param msgObj
      */
     function alertMsg(msgObj) {
-        setAlert(msgObj);
+        const futureTimeout = Date.now() + 4000;
+        const newAlertList = alert.concat({timeout: futureTimeout, ...msgObj});
+        setAlert(newAlertList);
         setTimeout(() => {
-            setAlert({})
-        }, 3000);
+            setAlert(alert.filter(a => a.timeout > Date.now()));
+        }, 5000);
     }
 
     /**
-     * Calculate a token from a shortened hash of the sanitized name
+     * Calculate a unique token from a shortened hash of the sanitized name
+     * Obviously since the hash is shortened, there is a collision risk, but should be small
      *
      * @param name - name of star
      */
@@ -72,12 +76,20 @@ function ClaimStar(props) {
         setTokenId(shortHash);
     }
 
+    /**
+     * Star name change needs to be handle separately since we are also calculating the token hash
+     * @param e
+     */
     function handleStarNameChange(e) {
         const name = e.target.value;
         setStarName(name);
         calculateToken(name);
     }
 
+    /**
+     * Wrapper for calling the Solidity method to create a star
+     * @return {Promise<void>}
+     */
     async function callCreateStar() {
         const {createStar, lookUptokenIdToStarInfo} = instance.methods;
         const intTokenId = parseInt(tokenId, 16);
@@ -105,6 +117,13 @@ function ClaimStar(props) {
         }
     }
 
+
+    /**
+     * Generic state hook for most of the form fields
+     *
+     * @param initialValue
+     * @return {{onChange: onChange, value: any}}
+     */
     function useFormInput(initialValue) {
         const [value, setValue] = useState(initialValue);
 
@@ -115,6 +134,12 @@ function ClaimStar(props) {
         return {value, onChange};
     }
 
+
+    /**
+     * Clicking the "Claim now!" button will call the wrapper to create a star
+     *
+     * @param event
+     */
     const handleSubmit = (event) => {
         const form = event.currentTarget;
         event.preventDefault();
@@ -201,13 +226,16 @@ function ClaimStar(props) {
 
                 <Form.Group as={Row}>
                     <Col sm="2">
-                        <input type="submit" value="Claim now!" disabled={!starName}/>
+                        <Button type="submit"  disabled={!starName}>Claim now!</Button>
                     </Col>
 
                     <Col sm="6">
-                        <Alert variant={alert.variant}>
-                            {alert.msg}
-                        </Alert>
+                        {alert.map((item, i) => {
+                            return <Alert key={i} variant={item.variant}>
+                                {item.msg}
+                            </Alert>
+
+                        })}
                     </Col>
                 </Form.Group>
 

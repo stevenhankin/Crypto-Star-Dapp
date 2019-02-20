@@ -6,6 +6,7 @@ import InputGroup from "react-bootstrap/InputGroup";
 
 // const RIPEMD160 = require('ripemd160')
 import RIPEMD160 from 'ripemd160';
+import Button from "react-bootstrap/Button";
 
 function LookupStar(props) {
 
@@ -25,40 +26,16 @@ function LookupStar(props) {
     const constellation = useFormInput();
 
 
-    /**
-     * Calculate a token from a shortened hash of the sanitized name
-     *
-     * @param name - name of star
-     */
-    // function calculateToken(name) {
-    //     let shortHash = "";
-    //     if (name) {
-    //         // Ensure that the "same" name, irrespective of spacing
-    //         // or case, will yield the same token
-    //         const sanitizedStr = name.replace(/\W/g, '').toUpperCase();
-    //         shortHash = new RIPEMD160().update(sanitizedStr).digest('hex').slice(0, 10);
-    //         console.log(`${sanitizedStr} new hash ${shortHash}`)
-    //     } else {
-    //         // When the star name is empty, we don't want to display
-    //         // a token id because that would be confusing
-    //         shortHash = "";
-    //     }
-    //     console.log(`setting token, was ${tokenId}`)
-    //     setTokenId(shortHash);
-    // }
-
-    // function handleStarNameChange(e) {
-    //     const name = e.target.value;
-    //     setStarName(name);
-    //     calculateToken(name);
-    // }
-
     async function lookupStarByToken() {
         const {lookUptokenIdToStarInfo} = instance.methods;
         const tokenId = parseInt(tokenHash.value, 16);
-        console.log (`Looking up star for token ${tokenId} from account ${account}`)
-        let starInfo = await lookUptokenIdToStarInfo(tokenId).call();
-        console.log(starInfo);
+        console.log(`Looking up star for token ${tokenId} from account ${account}`)
+        if (isNaN(tokenId)) {
+            console.log('NaN!!!!!')
+        } else {
+            let starInfo = await lookUptokenIdToStarInfo(tokenId).call();
+            setStarName(starInfo);
+        }
 
         // // Create a Hash for the star based on its name
         // const shortHash = new RIPEMD160().update(name).digest('hex').slice(0, 10);
@@ -84,6 +61,7 @@ function LookupStar(props) {
 
         function onChange(e) {
             setValue(e.target.value)
+            setStarName('')
         }
 
         return {value, onChange};
@@ -101,7 +79,6 @@ function LookupStar(props) {
         }
     };
 
-    // render() {
     return (
         <div>
             <h2>Find a star</h2>
@@ -115,75 +92,93 @@ function LookupStar(props) {
                     </Col>
                 </Form.Group>
 
-                <Col sm="2">
-                    <input type="submit" value="Lookup" disabled={!tokenHash.value}/>
-                </Col>
+                <Form.Group as={Row}>
+                    <Form.Label column="true" sm="2">
+                        <Button type="submit" disabled={!tokenHash.value}>Lookup</Button>
+                    </Form.Label>
+                </Form.Group>
+
+                <Form.Group hidden={!starName}>
+                    <Form.Group as={Row}>
+                        <Form.Label column="true" sm="2">Token</Form.Label>
+                        <div sm="5">
+                            <input type="text" readOnly value={tokenHash.value}/>
+                        </div>
+                    </Form.Group>
+
+                    <Form.Group as={Row}>
+                        <Form.Label column="true" sm="2">Name</Form.Label>
+                        <div sm="5">
+                            <input type="text" readOnly value={starName}/>
+                        </div>
+                    </Form.Group>
+                </Form.Group>
 
                 {/*<Form.Group as={Row}>*/}
-                    {/*<Form.Label column="true" sm="2">Name</Form.Label>*/}
-                    {/*<Col sm={5}>*/}
-                        {/*<Form.Control type="text" onChange={handleStarNameChange}*/}
-                                      {/*placeholder="Enter the name of your star here"/>*/}
-                    {/*</Col>*/}
+                {/*<Form.Label column="true" sm="2">Name</Form.Label>*/}
+                {/*<Col sm={5}>*/}
+                {/*<Form.Control type="text" onChange={handleStarNameChange}*/}
+                {/*placeholder="Enter the name of your star here"/>*/}
+                {/*</Col>*/}
                 {/*</Form.Group>*/}
 
                 {/*<Form.Group as={Row} controlId="validationStory">*/}
-                    {/*<Form.Label column="true" sm="2">Story</Form.Label>*/}
-                    {/*<Col sm="9">*/}
-                        {/*<Form.Control required type="text" {...story}*/}
-                                      {/*placeholder="Mention why this star is important to you"/>*/}
-                        {/*<Form.Control.Feedback type="invalid">Looks good!</Form.Control.Feedback>*/}
-                    {/*</Col>*/}
+                {/*<Form.Label column="true" sm="2">Story</Form.Label>*/}
+                {/*<Col sm="9">*/}
+                {/*<Form.Control required type="text" {...story}*/}
+                {/*placeholder="Mention why this star is important to you"/>*/}
+                {/*<Form.Control.Feedback type="invalid">Looks good!</Form.Control.Feedback>*/}
+                {/*</Col>*/}
                 {/*</Form.Group>*/}
 
                 {/*<Form.Group as={Row}>*/}
-                    {/*<Form.Label column="true" sm="2">Declination</Form.Label>*/}
-                    {/*<Col sm="3" md="2">*/}
-                        {/*<Form.Control {...declination} />*/}
-                    {/*</Col>*/}
+                {/*<Form.Label column="true" sm="2">Declination</Form.Label>*/}
+                {/*<Col sm="3" md="2">*/}
+                {/*<Form.Control {...declination} />*/}
+                {/*</Col>*/}
                 {/*</Form.Group>*/}
 
                 {/*<Form.Group as={Row}>*/}
-                    {/*<Form.Label column="true" sm="2">Right Ascension</Form.Label>*/}
-                    {/*<Col sm="3" md="2">*/}
-                        {/*<InputGroup>*/}
-                            {/*<InputGroup.Append>*/}
-                                {/*<InputGroup.Text id="hrs-addon">hrs</InputGroup.Text>*/}
-                            {/*</InputGroup.Append>*/}
-                            {/*<Form.Control type="text" aria-describedby="hrs-addon" {...raHours}/>*/}
-                        {/*</InputGroup>*/}
-                    {/*</Col>*/}
-                    {/*<Col sm="3" md="2">*/}
-                        {/*<InputGroup>*/}
-                            {/*<InputGroup.Append>*/}
-                                {/*<InputGroup.Text id="sec-addon">sec</InputGroup.Text>*/}
-                            {/*</InputGroup.Append>*/}
-                            {/*<Form.Control type="text" {...raMinutes}/>*/}
-                        {/*</InputGroup>*/}
-                    {/*</Col>*/}
-                    {/*<Col sm="3" md="2">*/}
-                        {/*<InputGroup>*/}
-                            {/*<InputGroup.Append>*/}
-                                {/*<InputGroup.Text id="min-addon">min</InputGroup.Text>*/}
-                            {/*</InputGroup.Append>*/}
-                            {/*<Form.Control type="text" {...raSeconds}/>*/}
-                        {/*</InputGroup>*/}
-                    {/*</Col>*/}
+                {/*<Form.Label column="true" sm="2">Right Ascension</Form.Label>*/}
+                {/*<Col sm="3" md="2">*/}
+                {/*<InputGroup>*/}
+                {/*<InputGroup.Append>*/}
+                {/*<InputGroup.Text id="hrs-addon">hrs</InputGroup.Text>*/}
+                {/*</InputGroup.Append>*/}
+                {/*<Form.Control type="text" aria-describedby="hrs-addon" {...raHours}/>*/}
+                {/*</InputGroup>*/}
+                {/*</Col>*/}
+                {/*<Col sm="3" md="2">*/}
+                {/*<InputGroup>*/}
+                {/*<InputGroup.Append>*/}
+                {/*<InputGroup.Text id="sec-addon">sec</InputGroup.Text>*/}
+                {/*</InputGroup.Append>*/}
+                {/*<Form.Control type="text" {...raMinutes}/>*/}
+                {/*</InputGroup>*/}
+                {/*</Col>*/}
+                {/*<Col sm="3" md="2">*/}
+                {/*<InputGroup>*/}
+                {/*<InputGroup.Append>*/}
+                {/*<InputGroup.Text id="min-addon">min</InputGroup.Text>*/}
+                {/*</InputGroup.Append>*/}
+                {/*<Form.Control type="text" {...raSeconds}/>*/}
+                {/*</InputGroup>*/}
+                {/*</Col>*/}
                 {/*</Form.Group>*/}
 
                 {/*<Form.Group as={Row}>*/}
-                    {/*<Form.Label column="true" sm="2">Constellation</Form.Label>*/}
-                    {/*<Col sm={9} md={6}>*/}
-                        {/*<Form.Control as="select" {...constellation}>*/}
-                            {/*{constellations.map(x => <option>{x}</option>)}*/}
-                        {/*</Form.Control>*/}
-                    {/*</Col>*/}
+                {/*<Form.Label column="true" sm="2">Constellation</Form.Label>*/}
+                {/*<Col sm={9} md={6}>*/}
+                {/*<Form.Control as="select" {...constellation}>*/}
+                {/*{constellations.map(x => <option>{x}</option>)}*/}
+                {/*</Form.Control>*/}
+                {/*</Col>*/}
                 {/*</Form.Group>*/}
 
 
                 {/*<Form.Group as={Row}>*/}
-                    {/*<Form.Label column="true" sm="2">Status</Form.Label>*/}
-                    {/*<Form.Label column="true" sm="5">{requestStatus}</Form.Label>*/}
+                {/*<Form.Label column="true" sm="2">Status</Form.Label>*/}
+                {/*<Form.Label column="true" sm="5">{requestStatus}</Form.Label>*/}
                 {/*</Form.Group>*/}
 
             </Form>
