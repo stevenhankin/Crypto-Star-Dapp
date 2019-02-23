@@ -95,25 +95,33 @@ function ClaimStar(props) {
         const intTokenId = parseInt(tokenId, 16);
         // Don't attempt to create a star that already exists
         // because it will just get rejected by the StarNotary contract anyway
-        let starInfo = await lookUptokenIdToStarInfo(intTokenId).call();
-        if (starInfo.length > 0) {
-            alertMsg({msg: `Star already claimed with token ${tokenId}`, variant: "primary"});
-        } else {
-            console.log('starInfo:', starInfo);
-            // Call the contract to create a star claim with the specified name (and derived hash)
-            try {
-                alertMsg({msg: "Submitted...", variant: "info"});
-                // await createStar(name, tokenId).call({from: account});
-                let receipt = await createStar(starName, intTokenId).send({from: account, gas: 500000});
-                if (receipt.transactionHash) {
-                    alertMsg({msg: `Confirmed ✅ Created with token ${tokenId}`, variant: "success"});
+        console.log('calling lookUptokenIdToStarInfo');
+        let starInfo = "";
+        try {
+            starInfo = await lookUptokenIdToStarInfo(intTokenId).call();
+            console.log('done');
+            if (starInfo.length > 0) {
+                alertMsg({msg: `Star already claimed with token ${tokenId}`, variant: "primary"});
+            } else {
+                console.log('starInfo:', starInfo);
+                // Call the contract to create a star claim with the specified name (and derived hash)
+                try {
+                    alertMsg({msg: "Submitted...", variant: "info"});
+                    // await createStar(name, tokenId).call({from: account});
+                    let receipt = await createStar(starName, intTokenId).send({from: account, gas: 500000});
+                    if (receipt.transactionHash) {
+                        alertMsg({msg: `Confirmed ✅ Created with token ${tokenId}`, variant: "success"});
+                    }
+                } catch (err) {
+                    alertMsg({msg: "Failed", variant: "primary"})
                 }
-            } catch (err) {
-                alertMsg({msg: "Failed", variant: "primary"})
+                // // Get the star info back to display to the user
+                // const starInfo = await lookUptokenIdToStarInfo(starNameHash).call({from: account});
+                // console.log('starInfo', JSON.stringify(starInfo));
             }
-            // // Get the star info back to display to the user
-            // const starInfo = await lookUptokenIdToStarInfo(starNameHash).call({from: account});
-            // console.log('starInfo', JSON.stringify(starInfo));
+        } catch (e) {
+            console.error('lookUptokenIdToStarInfo failed',e);
+            alertMsg({msg: "Unexpected error.  Hint: If using development network you may need to 'migrate --reset' the contract in truffle 😊", variant: "primary"})
         }
     }
 

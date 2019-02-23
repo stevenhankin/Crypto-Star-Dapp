@@ -47,13 +47,21 @@ function SellStar(props) {
             if (isNaN(price) || price <= 0) {
                 alertMsg({msg: `The price is not valid`, variant: 'warning'});
             } else {
-                // Let's see if the star exists
-                const starInfo = await lookUptokenIdToStarInfo(tokenId).call();
-                if (starInfo) {
-                    await putStarUpForSale(tokenId, price).send({from: account, gas: 500000});
-                    alertMsg({msg: `✅ ${starInfo} has been put up for sale`, variant: 'success'});
-                } else {
-                    alertMsg({msg: `${tokenHash.value} doesn't exist`, variant: 'warning'});
+                try {
+                    // Let's see if the star exists
+                    const starInfo = await lookUptokenIdToStarInfo(tokenId).call();
+                    if (starInfo) {
+                        await putStarUpForSale(tokenId, price).send({from: account, gas: 500000});
+                        alertMsg({msg: `✅ ${starInfo} has been put up for sale`, variant: 'success'});
+                    } else {
+                        alertMsg({msg: `${tokenHash.value} doesn't exist`, variant: 'warning'});
+                    }
+                } catch (e) {
+                    console.error('putStarUpForSale failed', e);
+                    alertMsg({
+                        msg: "Unexpected error.  Hint: If using development network you may need to 'migrate --reset' the contract in truffle 😊",
+                        variant: "primary"
+                    })
                 }
             }
         }
@@ -66,9 +74,11 @@ function SellStar(props) {
      */
     function useFormInput(initialValue) {
         const [value, setValue] = useState(initialValue);
+
         function onChange(e) {
             setValue(e.target.value);
         }
+
         return {value, onChange};
     }
 

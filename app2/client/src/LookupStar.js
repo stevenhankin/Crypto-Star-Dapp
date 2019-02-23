@@ -33,8 +33,16 @@ function LookupStar(props) {
         if (isNaN(tokenId)) {
             console.log('NaN!!!!!')
         } else {
-            let starInfo = await lookUptokenIdToStarInfo(tokenId).call();
-            setStarName(starInfo);
+            try {
+                let starInfo = await lookUptokenIdToStarInfo(tokenId).call();
+                setStarName(starInfo);
+            } catch (e) {
+                console.error('lookUptokenIdToStarInfo failed', e);
+                // alertMsg({
+                //     msg: "Unexpected error.  Hint: If using development network you may need to 'migrate --reset' the contract in truffle 😊",
+                //     variant: "primary"
+                // })
+            }
         }
     }
 
