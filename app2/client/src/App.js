@@ -1,8 +1,8 @@
 import React, {Component} from "react";
-import ClaimStar from "./ClaimStar";
-import LookupStar from "./LookupStar";
-import SellStar from "./SellStar";
-import BuyStar from "./BuyStar";
+import StarClaim from "./StarClaim";
+import StarLookup from "./StarLookup";
+import StarSell from "./StarSell";
+import BuyStar from "./StarBuy";
 // import getWeb3 from "./utils/getWeb3";
 import Tabs from "react-bootstrap/Tabs";
 import Tab from "react-bootstrap/Tab";
@@ -107,13 +107,13 @@ class App extends Component {
             <div className="App">
                 <Tabs defaultActiveKey="claim">
                     <Tab eventKey="claim" title="Claim">
-                        <ClaimStar instance={this.state.instance} account={this.state.account}/>
+                        <StarClaim instance={this.state.instance} account={this.state.account}/>
                     </Tab>
                     <Tab eventKey="lookup" title="Lookup">
-                        <LookupStar instance={this.state.instance} account={this.state.account}/>
+                        <StarLookup instance={this.state.instance} account={this.state.account}/>
                     </Tab>
                     <Tab eventKey="sell" title="Sell">
-                        <SellStar instance={this.state.instance} account={this.state.account}/>
+                        <StarSell instance={this.state.instance} account={this.state.account}/>
                     </Tab>
                     <Tab eventKey="buy" title="Buy">
                         <BuyStar instance={this.state.instance} account={this.state.account}/>

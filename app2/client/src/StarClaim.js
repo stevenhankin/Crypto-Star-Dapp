@@ -8,7 +8,7 @@ import Alert from "react-bootstrap/Alert";
 import RIPEMD160 from 'ripemd160';
 import Button from "react-bootstrap/Button";
 
-function ClaimStar(props) {
+function StarClaim(props) {
 
     /* State Hooks */
     const [account] = useState(props.account);
@@ -182,7 +182,7 @@ function ClaimStar(props) {
 
                 <Form.Group as={Row} controlId="validationStory">
                     <Form.Label column="true" sm="2">Story</Form.Label>
-                    <Col sm="9">
+                    <Col sm="6">
                         <Form.Control type="text" {...story}
                                       placeholder="Mention why this star is important to you"/>
                     </Col>
@@ -253,6 +253,6 @@ function ClaimStar(props) {
     );
 }
 
-export default ClaimStar;
+export default StarClaim;
 
 

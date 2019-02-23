@@ -5,7 +5,7 @@ import Row from "react-bootstrap/Row";
 import Button from "react-bootstrap/Button";
 import Alert from "react-bootstrap/Alert";
 
-function SellStar(props) {
+function StarBuy(props) {
 
     /* State Hooks */
     const [account] = useState(props.account);
@@ -93,7 +93,7 @@ function SellStar(props) {
 
     return (
         <div>
-            <h2>Sell a star</h2>
+            <h2>Buy a star</h2>
             <Form onSubmit={handleSell}>
 
                 <Form.Group as={Row}>
@@ -134,5 +134,5 @@ function SellStar(props) {
 }
 
 
-export default SellStar;
+export default StarBuy;
 

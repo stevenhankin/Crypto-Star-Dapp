@@ -8,7 +8,7 @@ import InputGroup from "react-bootstrap/InputGroup";
 import RIPEMD160 from 'ripemd160';
 import Button from "react-bootstrap/Button";
 
-function LookupStar(props) {
+function StarLookup(props) {
 
     /* State Hooks */
     const [account] = useState(props.account);
@@ -177,6 +177,6 @@ function LookupStar(props) {
     );
 }
 
-export default LookupStar;
+export default StarLookup;
 
 
