@@ -14,7 +14,6 @@ function StarBuy(props) {
 
     /* Custom state hooks */
     const tokenHash = useFormInput('');
-    const starPrice = useFormInput('');
 
     /**
      * Display a bootstrap alert for info
@@ -32,37 +31,32 @@ function StarBuy(props) {
     }
 
     /**
-     * Sell a star via the appropriate method on the contract
+     * Buy a star via the appropriate method on the contract
      * but first make some simple data checks to prevent
      * unnecessary gas burning
      * @return {Promise<void>}
      */
-    async function sellStar() {
-        const {lookUptokenIdToStarInfo, putStarUpForSale} = instance.methods;
+    async function buyStarByToken() {
+        const {lookUptokenIdToStarInfo, buyStar} = instance.methods;
         const tokenId = parseInt(tokenHash.value, 16);
-        const price = parseInt(starPrice.value);
         if (isNaN(tokenId)) {
             alertMsg({msg: `${tokenHash.value} is not a valid ID`, variant: 'warning'});
         } else {
-            if (isNaN(price) || price <= 0) {
-                alertMsg({msg: `The price is not valid`, variant: 'warning'});
-            } else {
-                try {
-                    // Let's see if the star exists
-                    const starInfo = await lookUptokenIdToStarInfo(tokenId).call();
-                    if (starInfo) {
-                        await putStarUpForSale(tokenId, price).send({from: account, gas: 500000});
-                        alertMsg({msg: `✅ ${starInfo} has been put up for sale`, variant: 'success'});
-                    } else {
-                        alertMsg({msg: `${tokenHash.value} doesn't exist`, variant: 'warning'});
-                    }
-                } catch (e) {
-                    console.error('putStarUpForSale failed', e);
-                    alertMsg({
-                        msg: "Unexpected error.  Hint: If using development network you may need to 'migrate --reset' the contract in truffle 😊",
-                        variant: "primary"
-                    })
+            try {
+                // Let's see if the star exists
+                const starInfo = await lookUptokenIdToStarInfo(tokenId).call();
+                if (starInfo) {
+                    await buyStar(tokenId).send({from: account, gas: 500000});
+                    alertMsg({msg: `✅ ${starInfo} has been put up for sale`, variant: 'success'});
+                } else {
+                    alertMsg({msg: `${tokenHash.value} doesn't exist`, variant: 'warning'});
                 }
+            } catch (e) {
+                console.error('putStarUpForSale failed', e);
+                alertMsg({
+                    msg: "Unexpected error.  Hint: If using development network you may need to 'migrate --reset' the contract in truffle 😊",
+                    variant: "primary"
+                })
             }
         }
     }
@@ -86,15 +80,17 @@ function StarBuy(props) {
      * Sell the star when the button is clicked
      * @param event
      */
-    const handleSell = (event) => {
+    const handlePurchase = (event) => {
         event.preventDefault();
-        sellStar().then(() => console.log('put star up for sale'))
+        buyStarByToken().then(() => console.log('put star up for sale'))
     };
 
     return (
-        <div>
-            <h2>Buy a star</h2>
-            <Form onSubmit={handleSell}>
+            <Form onSubmit={handlePurchase}>
+
+                <h6 style={{paddingTop: 20, paddingBottom: 20}}>A claimed star that has been
+                put up for sale can be purchased here</h6>
+
 
                 <Form.Group as={Row}>
                     <Form.Label column="true" sm="2">Token</Form.Label>
@@ -105,16 +101,8 @@ function StarBuy(props) {
                 </Form.Group>
 
                 <Form.Group as={Row}>
-                    <Form.Label column="true" sm="2">Price</Form.Label>
-                    <Col sm={5}>
-                        <Form.Control type="text" {...starPrice}
-                                      placeholder="Price > 0"/>
-                    </Col>
-                </Form.Group>
-
-                <Form.Group as={Row}>
                     <Form.Label column="true" sm="2">
-                        <Button type="submit" disabled={!tokenHash.value}>Sell Star</Button>
+                        <Button type="submit" disabled={!tokenHash.value}>Buy Star</Button>
                     </Form.Label>
 
                     <Col sm="6">
@@ -129,7 +117,6 @@ function StarBuy(props) {
 
             </Form>
 
-        </div>
     );
 }
 

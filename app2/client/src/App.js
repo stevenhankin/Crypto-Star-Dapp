@@ -11,6 +11,8 @@ import Web3 from "web3";
 
 import "./App.css";
 import starNotaryArtifact from "./contracts/StarNotary";
+import Container from "react-bootstrap/Container";
+import Jumbotron from "react-bootstrap/Jumbotron";
 
 class App extends Component {
 
@@ -71,21 +73,6 @@ class App extends Component {
             }
 
 
-            /*
-            // Get network provider and web3 instance.
-            // const web3 = await getWeb3();
-
-            // Use web3 to get the user's accounts.
-            const accounts = await web3.eth.getAccounts();
-
-            // Get the contract instance.
-            const networkId = await web3.eth.net.getId();
-            const deployedNetwork = SimpleStorageContract.networks[networkId];
-            const instance = new web3.eth.Contract(
-              SimpleStorageContract.abi,
-              deployedNetwork && deployedNetwork.address,
-            );
-      */
             // Set web3, accounts, and contract to the state, and then proceed with an
             // example of interacting with the contract's methods.
 
@@ -104,7 +91,11 @@ class App extends Component {
             return <div>Loading Web3, accounts, and contract...</div>;
         }
         return (
-            <div className="App">
+            <Container>
+                <Jumbotron>
+                    <h1>Crypto Star Notary</h1>
+                    <p>A decentralized app running on the Ethereum Blockchain</p>
+                </Jumbotron>
                 <Tabs defaultActiveKey="claim">
                     <Tab eventKey="claim" title="Claim">
                         <StarClaim instance={this.state.instance} account={this.state.account}/>
@@ -119,7 +110,7 @@ class App extends Component {
                         <BuyStar instance={this.state.instance} account={this.state.account}/>
                     </Tab>
                 </Tabs>
-            </div>
+            </Container>
         );
     }
 }

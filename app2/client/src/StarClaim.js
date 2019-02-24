@@ -161,9 +161,11 @@ function StarClaim(props) {
 
 
     return (
-        <div>
-            <h2>Claim</h2>
+        <React.Fragment>
             <Form onSubmit={handleSubmit}>
+
+                <h6 style={{paddingTop:20,paddingBottom:20}}>A star is given a unique token based on its name.
+                    Once claimed, you'll be able to sell it</h6>
 
                 <Form.Group as={Row}>
                     <Form.Label column="true" sm="2">Name</Form.Label>
@@ -249,7 +251,7 @@ function StarClaim(props) {
 
             </Form>
 
-        </div>
+        </React.Fragment>
     );
 }
 

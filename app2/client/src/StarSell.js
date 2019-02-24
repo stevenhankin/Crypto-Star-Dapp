@@ -54,7 +54,7 @@ function StarSell(props) {
                         await putStarUpForSale(tokenId, price).send({from: account, gas: 500000});
                         alertMsg({msg: `✅ ${starInfo} has been put up for sale`, variant: 'success'});
                     } else {
-                        alertMsg({msg: `${tokenHash.value} doesn't exist`, variant: 'warning'});
+                        alertMsg({msg: `Star ${tokenHash.value} doesn't exist`, variant: 'warning'});
                     }
                 } catch (e) {
                     console.error('putStarUpForSale failed', e);
@@ -92,9 +92,12 @@ function StarSell(props) {
     };
 
     return (
-        <div>
-            <h2>Sell a star</h2>
+
             <Form onSubmit={handleSell}>
+
+                <h6 style={{paddingTop: 20, paddingBottom: 20}}>You can sell a star that you have claimed
+                for any whole number of currency</h6>
+
 
                 <Form.Group as={Row}>
                     <Form.Label column="true" sm="2">Token</Form.Label>
@@ -128,8 +131,6 @@ function StarSell(props) {
                 </Form.Group>
 
             </Form>
-
-        </div>
     );
 }
 
