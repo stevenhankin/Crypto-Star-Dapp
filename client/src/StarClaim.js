@@ -4,18 +4,14 @@ import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import InputGroup from "react-bootstrap/InputGroup";
 import Alert from "react-bootstrap/Alert";
-
 import RIPEMD160 from 'ripemd160';
 import Button from "react-bootstrap/Button";
-// import Image from "./App";
 import Image from "react-bootstrap/Image";
 import Spinner from './resources/spinner.svg';
 
 function StarClaim(props) {
 
     /* State Hooks */
-    const [account] = useState(props.account);
-    const [instance] = useState(props.instance);
     const [starName, setStarName] = useState('');
     const [tokenId, setTokenId] = useState('');
     const [alert, setAlert] = useState([]);
@@ -81,7 +77,6 @@ function StarClaim(props) {
     }
 
 
-
     /**
      * Wrapper for calling the Solidity method to create a star
      * @return {Promise<void>}
@@ -103,7 +98,6 @@ function StarClaim(props) {
                 // Call the contract to create a star claim with the specified name (and derived hash)
                 try {
                     alertMsg({msg: "Submitted...", variant: "info"});
-                    // await createStar(name, tokenId).call({from: account});
                     let receipt = await createStar(starName, intTokenId).send({from: props.account, gas: 500000});
                     if (receipt.transactionHash) {
                         alertMsg({msg: `Confirmed ✅ Created with token ${tokenId}`, variant: "success"});
@@ -111,13 +105,13 @@ function StarClaim(props) {
                 } catch (err) {
                     alertMsg({msg: "Failed", variant: "primary"})
                 }
-                // // Get the star info back to display to the user
-                // const starInfo = await lookUptokenIdToStarInfo(starNameHash).call({from: account});
-                // console.log('starInfo', JSON.stringify(starInfo));
             }
         } catch (e) {
-            console.error('lookUptokenIdToStarInfo failed',e);
-            alertMsg({msg: "Unexpected error.  Hint: If using development network you may need to 'migrate --reset' the contract in truffle 😊", variant: "primary"})
+            console.error('lookUptokenIdToStarInfo failed', e);
+            alertMsg({
+                msg: "Unexpected error.  Hint: If using development network you may need to 'migrate --reset' the contract in truffle 😊",
+                variant: "primary"
+            })
         }
     }
 
@@ -140,20 +134,16 @@ function StarClaim(props) {
 
 
     /**
-     * Clicking the "Claim now!" button will call the wrapper to create a star
+     * Clicking the "Claim Star" button will call the wrapper to create a star
+     * and produce a Spinner until finished
      *
      * @param event
      */
     const handleSubmit = (event) => {
-        // const form = event.currentTarget;
         event.preventDefault();
-        // if (form.checkValidity() === false) {
-        //     event.stopPropagation();
-        // } else {
         setWaiting(true);
-            callCreateStar()
-                .then(() => setWaiting(false))
-        // }
+        callCreateStar()
+            .then(() => setWaiting(false))
     };
 
     /**
@@ -166,13 +156,13 @@ function StarClaim(props) {
         calculateToken(name);
     }
 
-    console.log("in StarClaim, the instance is",props.instance)
+    console.log("in StarClaim, the instance is", props.instance)
 
     return (
         <React.Fragment>
             <Form onSubmit={handleSubmit}>
 
-                <h6 style={{paddingTop:20,paddingBottom:20}}>A star is given a unique token based on its name.
+                <h6 style={{paddingTop: 20, paddingBottom: 20}}>A star is given a unique token based on its name.
                     Once claimed, you'll be able to sell it</h6>
 
                 <Form.Group as={Row}>
@@ -245,7 +235,7 @@ function StarClaim(props) {
 
                 <Form.Group as={Row}>
                     <Col sm="2">
-                        <Button type="submit"  disabled={!starName || waiting}>Claim Star</Button>
+                        <Button type="submit" disabled={!starName || waiting}>Claim Star</Button>
                     </Col>
 
                     <Col sm="6">

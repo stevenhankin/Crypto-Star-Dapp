@@ -8,8 +8,6 @@ import Alert from "react-bootstrap/Alert";
 function StarBuy(props) {
 
     /* State Hooks */
-    const [account] = useState(props.account);
-    const [instance] = useState(props.instance);
     const [alert, setAlert] = useState([]);
 
     /* Custom state hooks */
@@ -46,7 +44,7 @@ function StarBuy(props) {
                 // Let's see if the star exists
                 const starInfo = await lookUptokenIdToStarInfo(tokenId).call();
                 if (starInfo) {
-                    console.log('Using account',props.account);
+                    console.log('Using account', props.account);
                     await buyStar(tokenId).send({from: props.account, gas: 500000});
                     alertMsg({msg: `✅ ${starInfo} has been put up for sale`, variant: 'success'});
                 } else {
@@ -87,36 +85,36 @@ function StarBuy(props) {
     };
 
     return (
-            <Form onSubmit={handlePurchase}>
+        <Form onSubmit={handlePurchase}>
 
-                <h6 style={{paddingTop: 20, paddingBottom: 20}}>A claimed star that has been
+            <h6 style={{paddingTop: 20, paddingBottom: 20}}>A claimed star that has been
                 put up for sale can be purchased here</h6>
 
 
-                <Form.Group as={Row}>
-                    <Form.Label column="true" sm="2">Token</Form.Label>
-                    <Col sm={5}>
-                        <Form.Control type="text" {...tokenHash}
-                                      placeholder="ID of your star"/>
-                    </Col>
-                </Form.Group>
+            <Form.Group as={Row}>
+                <Form.Label column="true" sm="2">Token</Form.Label>
+                <Col sm={5}>
+                    <Form.Control type="text" {...tokenHash}
+                                  placeholder="ID of your star"/>
+                </Col>
+            </Form.Group>
 
-                <Form.Group as={Row}>
-                    <Form.Label column="true" sm="2">
-                        <Button type="submit" disabled={!tokenHash.value}>Buy Star</Button>
-                    </Form.Label>
+            <Form.Group as={Row}>
+                <Form.Label column="true" sm="2">
+                    <Button type="submit" disabled={!tokenHash.value}>Buy Star</Button>
+                </Form.Label>
 
-                    <Col sm="6">
-                        {alert.map((item, i) => {
-                            return <Alert key={i} variant={item.variant}>
-                                {item.msg}
-                            </Alert>
+                <Col sm="6">
+                    {alert.map((item, i) => {
+                        return <Alert key={i} variant={item.variant}>
+                            {item.msg}
+                        </Alert>
 
-                        })}
-                    </Col>
-                </Form.Group>
+                    })}
+                </Col>
+            </Form.Group>
 
-            </Form>
+        </Form>
 
     );
 }
