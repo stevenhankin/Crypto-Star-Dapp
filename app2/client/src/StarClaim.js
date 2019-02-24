@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, {useState} from "react";
 import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
@@ -76,22 +76,14 @@ function StarClaim(props) {
         setTokenId(shortHash);
     }
 
-    /**
-     * Star name change needs to be handle separately since we are also calculating the token hash
-     * @param e
-     */
-    function handleStarNameChange(e) {
-        const name = e.target.value;
-        setStarName(name);
-        calculateToken(name);
-    }
+
 
     /**
      * Wrapper for calling the Solidity method to create a star
      * @return {Promise<void>}
      */
     async function callCreateStar() {
-        const {createStar, lookUptokenIdToStarInfo} = instance.methods;
+        const {createStar, lookUptokenIdToStarInfo} = props.instance.methods;
         const intTokenId = parseInt(tokenId, 16);
         // Don't attempt to create a star that already exists
         // because it will just get rejected by the StarNotary contract anyway
@@ -108,7 +100,7 @@ function StarClaim(props) {
                 try {
                     alertMsg({msg: "Submitted...", variant: "info"});
                     // await createStar(name, tokenId).call({from: account});
-                    let receipt = await createStar(starName, intTokenId).send({from: account, gas: 500000});
+                    let receipt = await createStar(starName, intTokenId).send({from: props.account, gas: 500000});
                     if (receipt.transactionHash) {
                         alertMsg({msg: `Confirmed ✅ Created with token ${tokenId}`, variant: "success"});
                     }
@@ -149,16 +141,28 @@ function StarClaim(props) {
      * @param event
      */
     const handleSubmit = (event) => {
-        const form = event.currentTarget;
+        // const form = event.currentTarget;
         event.preventDefault();
-        if (form.checkValidity() === false) {
-            event.stopPropagation();
-        } else {
+        // if (form.checkValidity() === false) {
+        //     event.stopPropagation();
+        // } else {
             callCreateStar()
                 .then(() => console.log('created star'))
-        }
+        // }
     };
 
+    /**
+     * Star name change needs to be handle separately since we are also calculating the token hash
+     * @param e
+     */
+    function handleStarNameChange(e) {
+        const name = e.target.value;
+        setStarName(name);
+        calculateToken(name);
+    }
+
+
+    console.log("in StarClaim, the instance is",props.instance)
 
     return (
         <React.Fragment>
@@ -169,7 +173,7 @@ function StarClaim(props) {
 
                 <Form.Group as={Row}>
                     <Form.Label column="true" sm="2">Name</Form.Label>
-                    <Col sm={4}>
+                    <Col sm={10} md={6}>
                         <InputGroup>
 
                             <Form.Control type="text" onChange={handleStarNameChange}
@@ -184,7 +188,7 @@ function StarClaim(props) {
 
                 <Form.Group as={Row} controlId="validationStory">
                     <Form.Label column="true" sm="2">Story</Form.Label>
-                    <Col sm="6">
+                    <Col sm={10} md="6">
                         <Form.Control type="text" {...story}
                                       placeholder="Mention why this star is important to you"/>
                     </Col>

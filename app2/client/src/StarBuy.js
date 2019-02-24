@@ -37,7 +37,7 @@ function StarBuy(props) {
      * @return {Promise<void>}
      */
     async function buyStarByToken() {
-        const {lookUptokenIdToStarInfo, buyStar} = instance.methods;
+        const {lookUptokenIdToStarInfo, buyStar} = props.instance.methods;
         const tokenId = parseInt(tokenHash.value, 16);
         if (isNaN(tokenId)) {
             alertMsg({msg: `${tokenHash.value} is not a valid ID`, variant: 'warning'});
@@ -46,7 +46,8 @@ function StarBuy(props) {
                 // Let's see if the star exists
                 const starInfo = await lookUptokenIdToStarInfo(tokenId).call();
                 if (starInfo) {
-                    await buyStar(tokenId).send({from: account, gas: 500000});
+                    console.log('Using account',props.account);
+                    await buyStar(tokenId).send({from: props.account, gas: 500000});
                     alertMsg({msg: `✅ ${starInfo} has been put up for sale`, variant: 'success'});
                 } else {
                     alertMsg({msg: `${tokenHash.value} doesn't exist`, variant: 'warning'});

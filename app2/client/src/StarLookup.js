@@ -9,8 +9,6 @@ import Card from "react-bootstrap/Card";
 function StarLookup(props) {
 
     /* State Hooks */
-    const [account] = useState(props.account);
-    const [instance] = useState(props.instance);
     const [starName, setStarName] = useState('');
     const [alert, setAlert] = useState([]);
 
@@ -34,9 +32,8 @@ function StarLookup(props) {
 
 
     async function lookupStarByToken() {
-        const {lookUptokenIdToStarInfo} = instance.methods;
+        const {lookUptokenIdToStarInfo} = props.instance.methods;
         const tokenId = parseInt(tokenHash.value, 16);
-        console.log(`Looking up star for token ${tokenId} from account ${account}`)
         if (isNaN(tokenId)) {
             alertMsg({msg: `Invalid token`, variant: 'warning'});
         } else {

@@ -8,8 +8,6 @@ import Alert from "react-bootstrap/Alert";
 function StarSell(props) {
 
     /* State Hooks */
-    const [account] = useState(props.account);
-    const [instance] = useState(props.instance);
     const [alert, setAlert] = useState([]);
 
     /* Custom state hooks */
@@ -38,7 +36,7 @@ function StarSell(props) {
      * @return {Promise<void>}
      */
     async function sellStar() {
-        const {lookUptokenIdToStarInfo, putStarUpForSale} = instance.methods;
+        const {lookUptokenIdToStarInfo, putStarUpForSale} = props.instance.methods;
         const tokenId = parseInt(tokenHash.value, 16);
         const price = parseInt(starPrice.value);
         if (isNaN(tokenId)) {
@@ -51,7 +49,7 @@ function StarSell(props) {
                     // Let's see if the star exists
                     const starInfo = await lookUptokenIdToStarInfo(tokenId).call();
                     if (starInfo) {
-                        await putStarUpForSale(tokenId, price).send({from: account, gas: 500000});
+                        await putStarUpForSale(tokenId, price).send({from: props.account, gas: 500000});
                         alertMsg({msg: `✅ ${starInfo} has been put up for sale`, variant: 'success'});
                     } else {
                         alertMsg({msg: `Star ${tokenHash.value} doesn't exist`, variant: 'warning'});
