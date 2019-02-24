@@ -5,25 +5,16 @@ import StarSell from "./StarSell";
 import BuyStar from "./StarBuy";
 import Tabs from "react-bootstrap/Tabs";
 import Tab from "react-bootstrap/Tab";
-
 import Web3 from "web3";
-
 import starNotaryArtifact from "./contracts/StarNotary";
 import Container from "react-bootstrap/Container";
 import Jumbotron from "react-bootstrap/Jumbotron";
 import Image from "react-bootstrap/Image";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import Form from "react-bootstrap/Form";
-import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import DropdownItem from "react-bootstrap/DropdownItem";
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-// import { faEthe } from '@fortawesome/free-solid-svg-icons'
-// import ethereumIcon from './resources/16px-Ethereum_logo_2014.svg.png'
-import ethereumIcon from './resources/Ethereum_logo_2014.svg'
-//
-// import {fabEthereum} from  'react-icons/fa';
+import EthereumIcon from './resources/Ethereum_logo_2014.svg';
 
 function App() {
 
@@ -36,7 +27,7 @@ function App() {
 
     async function getProvider() {
         console.log('HERE')
-        const metaMaskEthProvider = window.ethereumXXX;
+        const metaMaskEthProvider = window.ethereum;
         if (metaMaskEthProvider) {
             console.log('Detected injected MetaMask Ethereum Provider');
             // use MetaMask's provider
@@ -93,8 +84,9 @@ function App() {
     useEffect(() => {
         getProvider()
     }, []);
+
     /**
-     * Once web3 has been set, the instance and accounts can be obtained
+     * Once web3 has been set, the contract instance and accounts can be obtained
      */
     useEffect(() => {
         getInstance();
@@ -133,7 +125,7 @@ function App() {
                                                 </DropdownItem>)}
                                     </DropdownButton>
                                 </Col>
-                                <Col><Image src={ethereumIcon} height={24}/> {balance || "unknown"}
+                                <Col><Image src={EthereumIcon} height={24}/> {balance || "unknown"}
                                 </Col>
                             </Row>
                         </Container>
@@ -142,19 +134,11 @@ function App() {
                         <Image
                             fluid
                             rounded
-                            src="https://images.unsplash.com/photo-1465101162946-4377e57745c3?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjF9"/>
+                            src={"https://images.unsplash.com/photo-1465101162946-4377e57745c3?ixlib="
+                            + "rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjF9"}/>
                     </Col>
                 </Row>
             </Jumbotron>
-
-            {/*<Form.Group as={Row} style={{backgroundColor:"lightgrey"}}>*/}
-            {/*<Form.Label column="true" sm="2">Account</Form.Label>*/}
-            {/*<Col sm={9} md={6}>*/}
-            {/*<Form.Control as="select" {...accounts}>*/}
-            {/*{accounts && accounts.map(x => <option key={x}>{x.substring(0,8)+"..."+x.substring(x.length-8)}</option>)}*/}
-            {/*</Form.Control>*/}
-            {/*</Col>*/}
-            {/*</Form.Group>*/}
 
             <Tabs defaultActiveKey="claim">
                 <Tab eventKey="claim" title="Claim">

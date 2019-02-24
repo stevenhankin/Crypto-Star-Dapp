@@ -7,6 +7,9 @@ import Alert from "react-bootstrap/Alert";
 
 import RIPEMD160 from 'ripemd160';
 import Button from "react-bootstrap/Button";
+// import Image from "./App";
+import Image from "react-bootstrap/Image";
+import Spinner from './resources/spinner.svg';
 
 function StarClaim(props) {
 
@@ -16,6 +19,7 @@ function StarClaim(props) {
     const [starName, setStarName] = useState('');
     const [tokenId, setTokenId] = useState('');
     const [alert, setAlert] = useState([]);
+    const [waiting, setWaiting] = useState(false);
 
     /* Custom state hooks */
     const story = useFormInput('');
@@ -146,8 +150,9 @@ function StarClaim(props) {
         // if (form.checkValidity() === false) {
         //     event.stopPropagation();
         // } else {
+        setWaiting(true);
             callCreateStar()
-                .then(() => console.log('created star'))
+                .then(() => setWaiting(false))
         // }
     };
 
@@ -160,7 +165,6 @@ function StarClaim(props) {
         setStarName(name);
         calculateToken(name);
     }
-
 
     console.log("in StarClaim, the instance is",props.instance)
 
@@ -238,12 +242,16 @@ function StarClaim(props) {
                     </Col>
                 </Form.Group>
 
+
                 <Form.Group as={Row}>
                     <Col sm="2">
-                        <Button type="submit"  disabled={!starName}>Claim now!</Button>
+                        <Button type="submit"  disabled={!starName || waiting}>Claim Star</Button>
                     </Col>
 
                     <Col sm="6">
+
+                        <Image hidden={!waiting} src={Spinner} height={48}/>
+
                         {alert.map((item, i) => {
                             return <Alert key={i} variant={item.variant}>
                                 {item.msg}
