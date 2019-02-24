@@ -3,16 +3,17 @@ import StarClaim from "./StarClaim";
 import StarLookup from "./StarLookup";
 import StarSell from "./StarSell";
 import BuyStar from "./StarBuy";
-// import getWeb3 from "./utils/getWeb3";
 import Tabs from "react-bootstrap/Tabs";
 import Tab from "react-bootstrap/Tab";
 
 import Web3 from "web3";
 
-import "./App.css";
 import starNotaryArtifact from "./contracts/StarNotary";
 import Container from "react-bootstrap/Container";
 import Jumbotron from "react-bootstrap/Jumbotron";
+import Image from "react-bootstrap/Image";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 
 class App extends Component {
 
@@ -93,8 +94,19 @@ class App extends Component {
         return (
             <Container>
                 <Jumbotron>
-                    <h1>Crypto Star Notary</h1>
-                    <p>A decentralized app running on the Ethereum Blockchain</p>
+                    <Row>
+                        <Col>
+                            <h1>Crypto Star Notary</h1>
+                            <p class="lead">A decentralized app running on the Ethereum Blockchain</p>
+                            <p>This app utilises a non-fungible "SUN" token, defined in its solidity contract</p>
+                        </Col>
+                        <Col>
+                            <Image
+                                fluid
+                                rounded
+                                src="https://images.unsplash.com/photo-1465101162946-4377e57745c3?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max&ixid=eyJhcHBfaWQiOjF9"/>
+                        </Col>
+                    </Row>
                 </Jumbotron>
                 <Tabs defaultActiveKey="claim">
                     <Tab eventKey="claim" title="Claim">
