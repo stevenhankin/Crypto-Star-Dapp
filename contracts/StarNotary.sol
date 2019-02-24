@@ -14,9 +14,9 @@ contract StarNotary is ERC721Full, ERC721Mintable {
     }
 
     /**
-      * Initialise name and symbol properties through the constructor
-      * as per example on https://www.npmjs.com/package/openzeppelin-solidity
-      */
+       Initialise name and symbol properties through the constructor
+       as per example on https://www.npmjs.com/package/openzeppelin-solidity
+     */
     constructor() ERC721Full("StarNotary Token", "SUN") public {
     }
 
@@ -26,7 +26,7 @@ contract StarNotary is ERC721Full, ERC721Mintable {
     // mapping the TokenId and price
     mapping(uint256 => uint256) public starsForSale;
 
-    /** Create Star using the Struct */
+    // Create Star using the Struct
     function createStar(string memory _name, uint256 _tokenId) public {
         // Passing the name and tokenId as a parameters
         Star memory newStar = Star(_name);
@@ -37,8 +37,9 @@ contract StarNotary is ERC721Full, ERC721Mintable {
         // _mint assign the the star with _tokenId to the sender address (ownership)
     }
 
-    /** Putting an Star for sale (Adding the star tokenid into the mapping starsForSale,
-      * first verify that the sender is the owner)
+    /**
+       Putting an Star for sale (Adding the star tokenid into the mapping starsForSale,
+       first verify that the sender is the owner)
       */
     function putStarUpForSale(uint256 _tokenId, uint256 _price) public {
         require(ownerOf(_tokenId) == msg.sender, "You can't sell a Star you don't own");
@@ -60,10 +61,10 @@ contract StarNotary is ERC721Full, ERC721Mintable {
         }
     }
 
-    // Implement Task 1 lookUptokenIdToStarInfo
+    /**
+      Get the Star (struct) and return its name property
+      */
     function lookUptokenIdToStarInfo(uint _tokenId) public view returns (string memory) {
-        /* Get the Star (struct) and return its name property
-         */
         return tokenIdToStarInfo[_tokenId].name;
     }
 
@@ -90,7 +91,7 @@ contract StarNotary is ERC721Full, ERC721Mintable {
     }
 
     /**
-      * Transfer a sender's star to another address
+       Transfer a sender's star to another address
       */
     function transferStar(address _to1, uint256 _tokenId) public {
         // Verify that the sender owns the star token
